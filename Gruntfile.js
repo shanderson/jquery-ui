@@ -24,26 +24,6 @@ var
 
 	allI18nFiles = expandFiles( "ui/i18n/*.js" ),
 
-	cssFiles = [
-		"core",
-		"accordion",
-		"autocomplete",
-		"button",
-		"datepicker",
-		"dialog",
-		"menu",
-		"progressbar",
-		"resizable",
-		"selectable",
-		"slider",
-		"spinner",
-		"tabs",
-		"tooltip",
-		"theme"
-	].map(function( component ) {
-		return "themes/base/jquery.ui." + component + ".css";
-	}),
-
 	// minified files
 	minify = {
 		options: {
@@ -64,19 +44,6 @@ var
 			files: {
 				"dist/i18n/jquery-ui-i18n.min.js": "dist/i18n/jquery-ui-i18n.js"
 			}
-		}
-	},
-
-	minifyCSS = {
-		options: {
-			keepSpecialComments: 0
-		},
-		main: {
-			options: {
-				keepSpecialComments: "*"
-			},
-			src: "dist/jquery-ui.css",
-			dest: "dist/jquery-ui.min.css"
 		}
 	},
 
@@ -107,16 +74,6 @@ uiFiles.concat( allI18nFiles ).forEach(function( file ) {
 	minify[ file ].files[ mapMinFile( file ) ] = file;
 });
 
-cssFiles.forEach(function( file ) {
-	minifyCSS[ file ] = {
-		options: {
-			banner: createBanner()
-		},
-		src: file,
-		dest: "dist/" + file.replace( /\.css$/, ".min.css" ).replace( /themes\/base\//, "themes/base/minified/" )
-	};
-});
-
 uiFiles.forEach(function( file ) {
 	// TODO this doesn't do anything until https://github.com/rwldrn/grunt-compare-size/issues/13
 	compareFiles[ file ] = [ file,  mapMinFile( file ) ];
@@ -128,7 +85,6 @@ grunt.loadNpmTasks( "grunt-contrib-uglify" );
 grunt.loadNpmTasks( "grunt-contrib-concat" );
 grunt.loadNpmTasks( "grunt-contrib-qunit" );
 grunt.loadNpmTasks( "grunt-contrib-csslint" );
-grunt.loadNpmTasks( "grunt-contrib-cssmin" );
 grunt.loadNpmTasks( "grunt-html" );
 grunt.loadNpmTasks( "grunt-compare-size" );
 grunt.loadNpmTasks( "grunt-git-authors" );
@@ -166,27 +122,9 @@ grunt.initConfig({
 			},
 			src: uiFiles,
 			dest: "dist/jquery-ui.js"
-		},
-		i18n: {
-			options: {
-				banner: createBanner( allI18nFiles )
-			},
-			src: allI18nFiles,
-			dest: "dist/i18n/jquery-ui-i18n.js"
-		},
-		css: {
-			options: {
-				banner: createBanner( cssFiles ),
-				stripBanners: {
-					block: true
-				}
-			},
-			src: cssFiles,
-			dest: "dist/jquery-ui.css"
 		}
 	},
 	uglify: minify,
-	cssmin: minifyCSS,
 	htmllint: {
 		// ignore files that contain invalid html, used only for ajax content testing
 		all: grunt.file.expand( [ "demos/**/*.html", "tests/**/*.html" ] ).filter(function( file ) {
@@ -245,11 +183,8 @@ grunt.initConfig({
 
 grunt.registerTask( "default", [ "lint", "test" ] );
 grunt.registerTask( "lint", [ "asciilint", "jshint", "csslint", "htmllint" ] );
-grunt.registerTask( "test", [ "qunit" ] );
+grunt.registerTask( "test", [ "copy:dist_units_images", "qunit" ] );
 grunt.registerTask( "sizer", [ "concat:ui", "uglify:main", "compare_size:all" ] );
 grunt.registerTask( "sizer_all", [ "concat:ui", "uglify", "compare_size" ] );
-
-// "copy:dist_units_images" is used by unit tests
-grunt.registerTask( "build", [ "concat", "uglify", "cssmin", "copy:dist_units_images" ] );
 
 };
