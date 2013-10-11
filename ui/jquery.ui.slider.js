@@ -1,3 +1,4 @@
+// Modified slider for jQuery A11Y Deque Summit!
 /*!
  * jQuery UI Slider @VERSION
  * http://jqueryui.com
