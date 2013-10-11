@@ -39,7 +39,11 @@ $.widget( "ui.slider", $.ui.mouse, {
 		change: null,
 		slide: null,
 		start: null,
-		stop: null
+		stop: null,
+		aria: {
+			labelId: null,
+			unitText: ""
+		}
 	},
 
 	_create: function() {
@@ -74,7 +78,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 		var i, handleCount,
 			options = this.options,
 			existingHandles = this.element.find( ".ui-slider-handle" ).addClass( "ui-state-default ui-corner-all" ),
-			handle = "<a class='ui-slider-handle ui-state-default ui-corner-all' href='#'></a>",
+			handle = "<a class='ui-slider-handle ui-state-default ui-corner-all' href='#' role='slider'></a>",
 			handles = [];
 
 		handleCount = ( options.values && options.values.length ) || 1;
@@ -91,6 +95,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 		this.handles = existingHandles.add( $( handles.join( "" ) ).appendTo( this.element ) );
 
 		this.handle = this.handles.eq( 0 );
+		this.handle.attr( "aria-labelledby" , options.aria.labelId );
 
 		this.handles.each(function( i ) {
 			$( this ).data( "ui-slider-handle-index", i );
@@ -594,6 +599,16 @@ $.widget( "ui.slider", $.ui.mouse, {
 			if ( oRange === "max" && this.orientation === "vertical" ) {
 				this.range[ animate ? "animate" : "css" ]( { height: ( 100 - valPercent ) + "%" }, { queue: false, duration: o.animate } );
 			}
+			this.handle.attr( "aria-valuemax", valueMax );
+			this.handle.attr( "aria-valuemin", valueMin );
+			this.handle.attr( "aria-valuenow", value );
+			
+			if ( o.aria.unitText ) {
+				var textTokens = o.aria.unitText.split( ";" ),
+					singleText = textTokens[0].replace( "%s", value ),
+					pluralText = textTokens[1].replace( "%s", value );
+				this.handle.attr( "aria-valueText", ( value === 1 ? singleText : pluralText ));				
+			}			
 		}
 	},
 

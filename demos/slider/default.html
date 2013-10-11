@@ -12,12 +12,22 @@
 	<link rel="stylesheet" href="../demos.css">
 	<script>
 	$(function() {
-		$( "#slider" ).slider();
+		$( "#slider" ).slider(
+			{
+				//min : 20,
+				//max : 75,
+				aria : {
+					labelId : "mySliderLabel",
+					unitText : "%s dollar;%s dollars"
+				}
+			}
+		);
 	});
 	</script>
 </head>
 <body>
 
+<p id="mySliderLabel">Rental Price</p>
 <div id="slider"></div>
 
 <div class="demo-description">
